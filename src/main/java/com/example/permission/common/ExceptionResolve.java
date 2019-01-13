@@ -1,5 +1,6 @@
 package com.example.permission.common;
 
+import com.example.permission.exception.ParamException;
 import com.example.permission.exception.PermissionException;
 import com.example.permission.util.ResultVOUtil;
 import com.example.permission.vo.ResultVO;
@@ -25,7 +26,7 @@ public class ExceptionResolve implements HandlerExceptionResolver {
         ModelAndView modelAndView;
         String defaultMsg = "System error";
         if (url.endsWith(".json")) {
-            if (e instanceof PermissionException) {
+            if (e instanceof PermissionException || e instanceof ParamException) {
                 ResultVO resultVO = ResultVOUtil.error(e.getMessage());
                 modelAndView = new ModelAndView(new MappingJackson2JsonView(), resultVO.toMap());
             } else {
