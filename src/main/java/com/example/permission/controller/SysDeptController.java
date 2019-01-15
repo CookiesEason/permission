@@ -24,20 +24,20 @@ public class SysDeptController {
     @Autowired
     private SysTreeService sysTreeService;
 
-    @RequestMapping("/save.json")
+    @RequestMapping("/save")
     @ResponseBody
     public ResultVO saveDept(DeptParam deptParam) {
         sysDeptService.save(deptParam);
         return ResultVOUtil.success();
     }
 
-    @RequestMapping("/tree.json")
+    @RequestMapping("/tree")
     @ResponseBody
     public ResultVO tree() {
         return ResultVOUtil.success(sysTreeService.deptTree());
     }
 
-    @RequestMapping("/update.json")
+    @RequestMapping("/update")
     @ResponseBody
     public ResultVO updateDept(DeptParam deptParam) {
         sysDeptService.update(deptParam);

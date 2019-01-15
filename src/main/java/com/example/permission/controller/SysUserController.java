@@ -19,13 +19,13 @@ public class SysUserController {
     @Autowired
     private SysUserService sysUserService;
 
-    @RequestMapping("/save.json")
+    @RequestMapping("/save")
     public ResultVO save(UserParam userParam) {
         sysUserService.save(userParam);
         return ResultVOUtil.success();
     }
 
-    @RequestMapping("/update.json")
+    @RequestMapping("/update")
     public ResultVO update(UserParam userParam) {
         sysUserService.update(userParam);
         return ResultVOUtil.success();
