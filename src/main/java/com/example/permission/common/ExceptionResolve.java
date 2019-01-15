@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
  * @author CookiesEason
  * 2019/01/13 18:04
  */
-@Component
 @Slf4j
 public class ExceptionResolve implements HandlerExceptionResolver {
     @Override

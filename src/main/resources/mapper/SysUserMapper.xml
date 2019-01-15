@@ -24,6 +24,28 @@
     from sys_user
     where id = #{id,jdbcType=INTEGER}
   </select>
+  <select id="findByKeyword" resultType="com.example.permission.model.SysUser">
+    select
+    <include refid="Base_Column_List"/>
+    from sys_user where telephone = #{keyword}
+    or mail = #{keyword}
+  </select>
+  <select id="countByEmail" resultType="java.lang.Integer">
+    select count(1)
+    from sys_user
+    where mail = #{email}
+    <if test="userId !=null">
+      and id != #{userId}
+    </if>
+  </select>
+  <select id="countByTelephone" resultType="java.lang.Integer">
+    select count(1)
+    from sys_user
+    where telephone = #{phone}
+    <if test="userId !=null">
+      and id != #{userId}
+    </if>
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from sys_user
     where id = #{id,jdbcType=INTEGER}
