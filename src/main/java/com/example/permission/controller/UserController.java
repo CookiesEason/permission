@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author CookiesEason
  * 2019/01/15 19:10
  */
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 @RestController
 public class UserController {
 

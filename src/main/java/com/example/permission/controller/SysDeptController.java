@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * 2019/01/14 16:12
  */
 @Controller
-@RequestMapping("/sys/dept")
+@RequestMapping("/api/sys/dept")
 public class SysDeptController {
 
     @Autowired

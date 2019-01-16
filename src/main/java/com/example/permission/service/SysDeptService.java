@@ -61,8 +61,14 @@ public class SysDeptService {
         String newLevel = newDept.getLevel();
         String oldLevel = oldDept.getLevel();
         if (!newLevel.equals(oldLevel)) {
-            List<SysDept> sysDepts = sysDeptMapper.getChildDeptListByLevel(oldDept.getLevel());
-            if (sysDepts != null) {
+            List<SysDept> sysDepts;
+            if (oldDept.getParentId() == 0) {
+                String level = LevelUtil.calculateLevel(String.valueOf(0), oldDept.getId());
+                sysDepts = sysDeptMapper.getChildDeptListByTop(level);
+            } else {
+                sysDepts = sysDeptMapper.getChildDeptListByLevel(oldDept.getLevel());
+            }
+            if (sysDepts != null && sysDepts.size() > 0) {
                 for (SysDept sysDept : sysDepts) {
                     String level  = sysDept.getLevel();
                     if (level.indexOf(oldLevel) == 0) {
