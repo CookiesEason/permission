@@ -2,12 +2,14 @@ package com.example.permission.service;
 
 import com.example.permission.dao.SysUserMapper;
 import com.example.permission.exception.PermissionException;
+import com.example.permission.form.PageQuery;
 import com.example.permission.form.UserParam;
 import com.example.permission.model.SysUser;
 import com.example.permission.util.MD5Util;
 import com.example.permission.util.PasswordUtil;
 import com.example.permission.util.ResultVOUtil;
 import com.example.permission.util.ValidatorUtil;
+import com.example.permission.vo.PageResult;
 import com.example.permission.vo.ResultVO;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author CookiesEason
@@ -80,6 +83,16 @@ public class SysUserService {
             return ResultVOUtil.success();
         }
         return ResultVOUtil.error(errorMsg);
+    }
+
+    public PageResult<SysUser> getPageByDeptId(Integer deptId, PageQuery pageQuery) {
+        ValidatorUtil.check(pageQuery);
+        int count = sysUserMapper.countByDeptId(deptId);
+        if (count > 0) {
+            List<SysUser> list = sysUserMapper.getPageByDeptId(deptId, pageQuery);
+            return PageResult.<SysUser>builder().total(count).data(list).build();
+        }
+        return PageResult.<SysUser>builder().build();
     }
 
     private SysUser findByKeyword(String keyword) {

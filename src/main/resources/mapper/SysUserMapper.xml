@@ -46,6 +46,18 @@
       and id != #{userId}
     </if>
   </select>
+    <select id="countByDeptId" resultType="java.lang.Integer">
+      SELECT COUNT(1)
+      FROM sys_user
+      WHERE dept_id = #{deptId}
+    </select>
+  <select id="getPageByDeptId" resultType="com.example.permission.model.SysUser">
+    select <include refid="Base_Column_List"/>
+    from sys_user
+    where dept_id = #{deptId}
+    order by username asc
+    limit #{page.offset}, #{page.pageSize}
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from sys_user
     where id = #{id,jdbcType=INTEGER}

@@ -5,12 +5,12 @@ import com.example.permission.service.SysUserService;
 import com.example.permission.util.MD5Util;
 import com.example.permission.util.ResultVOUtil;
 import com.example.permission.vo.ResultVO;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author CookiesEason
@@ -32,6 +32,12 @@ public class UserController {
     public ResultVO logout(HttpServletRequest request) {
         request.getSession().invalidate();
         return ResultVOUtil.success();
+    }
+
+    @GetMapping("/info")
+    public ResultVO info(HttpServletRequest request) {
+        SysUser sysUser = (SysUser) request.getSession().getAttribute("user");
+        return ResultVOUtil.success(sysUser);
     }
 
 }
