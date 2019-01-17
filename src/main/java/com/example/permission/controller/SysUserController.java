@@ -1,5 +1,6 @@
 package com.example.permission.controller;
 
+import com.example.permission.common.RequestHolder;
 import com.example.permission.form.PageQuery;
 import com.example.permission.form.UserParam;
 import com.example.permission.service.SysUserService;
@@ -38,6 +39,11 @@ public class SysUserController {
     public ResultVO list(Integer deptId, PageQuery pageQuery) {
         PageResult pageResult = sysUserService.getPageByDeptId(deptId, pageQuery);
         return ResultVOUtil.success(pageResult);
+    }
+
+    @GetMapping("/info")
+    public ResultVO info() {
+        return ResultVOUtil.success(RequestHolder.getUser());
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.permission.controller;
 
+import com.example.permission.common.RequestHolder;
 import com.example.permission.model.SysUser;
 import com.example.permission.service.SysUserService;
 import com.example.permission.util.MD5Util;
@@ -32,12 +33,6 @@ public class UserController {
     public ResultVO logout(HttpServletRequest request) {
         request.getSession().invalidate();
         return ResultVOUtil.success();
-    }
-
-    @GetMapping("/info")
-    public ResultVO info(HttpServletRequest request) {
-        SysUser sysUser = (SysUser) request.getSession().getAttribute("user");
-        return ResultVOUtil.success(sysUser);
     }
 
 }

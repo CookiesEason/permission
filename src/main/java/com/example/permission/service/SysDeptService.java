@@ -1,9 +1,11 @@
 package com.example.permission.service;
 
+import com.example.permission.common.RequestHolder;
 import com.example.permission.dao.SysDeptMapper;
 import com.example.permission.exception.ParamException;
 import com.example.permission.form.DeptParam;
 import com.example.permission.model.SysDept;
+import com.example.permission.util.IPUtil;
 import com.example.permission.util.LevelUtil;
 import com.example.permission.util.ValidatorUtil;
 import com.google.common.base.Preconditions;
@@ -33,8 +35,8 @@ public class SysDeptService {
                 .build();
         sysDept.setLevel(LevelUtil.calculateLevel(getLevel(deptParam.getParentId()), deptParam.getParentId()));
         // TODO: 2019/01/15  暂时固定
-        sysDept.setOperator("System");
-        sysDept.setOperateIp("127.0.0.1");
+        sysDept.setOperator(RequestHolder.getUser().getUsername());
+        sysDept.setOperateIp(IPUtil.getRemoteIp(RequestHolder.getRequest()));
         sysDept.setOperateTime(new Date());
         sysDeptMapper.insertSelective(sysDept);
     }
@@ -51,8 +53,8 @@ public class SysDeptService {
                 .build();
         sysDept.setLevel(LevelUtil.calculateLevel(getLevel(deptParam.getParentId()), sysDept.getParentId() ));
         // TODO: 2019/01/15  暂时固定
-        sysDept.setOperator("System-Update");
-        sysDept.setOperateIp("127.0.0.1");
+        sysDept.setOperator(RequestHolder.getUser().getUsername());
+        sysDept.setOperateIp(IPUtil.getRemoteIp(RequestHolder.getRequest()));
         sysDept.setOperateTime(new Date());
         updateWithChild(old, sysDept);
     }

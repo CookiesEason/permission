@@ -1,18 +1,20 @@
 package com.example.permission.service;
 
+import com.example.permission.common.RequestHolder;
 import com.example.permission.dao.SysUserMapper;
 import com.example.permission.exception.PermissionException;
 import com.example.permission.form.PageQuery;
 import com.example.permission.form.UserParam;
 import com.example.permission.model.SysUser;
-import com.example.permission.util.MD5Util;
-import com.example.permission.util.PasswordUtil;
-import com.example.permission.util.ResultVOUtil;
-import com.example.permission.util.ValidatorUtil;
+import com.example.permission.util.*;
 import com.example.permission.vo.PageResult;
 import com.example.permission.vo.ResultVO;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.A;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -30,6 +32,9 @@ public class SysUserService {
     @Resource
     private SysUserMapper sysUserMapper;
 
+    @Autowired
+    private JavaMailSender javaMailSender;
+
     public void save(UserParam userParam) {
         check(userParam);
         String password = PasswordUtil.generate();
@@ -40,10 +45,12 @@ public class SysUserService {
                 .telephone(userParam.getTelephone()).remark(userParam.getRemark()).username(userParam.getName())
                 .password(password).status(userParam.getStatus())
                 .build();
-        sysUser.setOperator("System");
-        sysUser.setOperateIp("127.0.0.1");
+        sysUser.setOperator(RequestHolder.getUser().getUsername());
+        sysUser.setOperateIp(IPUtil.getRemoteIp(RequestHolder.getRequest()));
         sysUser.setOperateTime(new Date());
-        // TODO: 2019/01/15 sendEmail
+//        已经实现发送邮件功能，具体配置在yml内
+//        SimpleMailMessage simpleMailMessage = EmailUtil.send(userParam.getMail(), password);
+//        javaMailSender.send(simpleMailMessage);
         sysUserMapper.insertSelective(sysUser);
     }
 
@@ -56,8 +63,8 @@ public class SysUserService {
                 .deptId(userParam.getDeptId()).mail(userParam.getMail())
                 .telephone(userParam.getTelephone()).remark(userParam.getRemark()).username(userParam.getName()).status(userParam.getStatus())
                 .build();
-        sysUser.setOperator("System-Update");
-        sysUser.setOperateIp("127.0.0.1");
+        sysUser.setOperator(RequestHolder.getUser().getUsername());
+        sysUser.setOperateIp(IPUtil.getRemoteIp(RequestHolder.getRequest()));
         sysUser.setOperateTime(new Date());
         sysUserMapper.updateByPrimaryKeySelective(sysUser);
     }

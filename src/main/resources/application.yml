@@ -9,6 +9,15 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
+  mail:
+    host: smtp.qq.com
+    username: 837447352@qq.com
+    password: ''
+    default-encoding: UTF-8
+    properties:
+      mail:
+        stmp:
+          auth: true
 logging:
   level:
     com.example.permission.dao: debug
