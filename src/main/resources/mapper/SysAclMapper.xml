@@ -25,6 +25,25 @@
     from sys_acl
     where id = #{id,jdbcType=INTEGER}
   </select>
+  <select id="countByModuleIdAndName" resultType="java.lang.Integer">
+    select count(1) from sys_acl
+    where acl_module_id = #{aclModuleId}
+    and name = #{name}
+    <if test="id != null">
+      and id != #{id}
+    </if>
+  </select>
+  <select id="countByAclModuleId" resultType="java.lang.Integer">
+    select count(1) from sys_acl
+    where acl_module_id = #{aclModuleId}
+  </select>
+  <select id="getPageByAclModuleId" resultType="com.example.permission.model.SysAcl">
+    select <include refid="Base_Column_List"/>
+    from sys_acl
+    where acl_module_id = #{aclModuleId}
+    order by seq asc, name asc
+    limit #{page.offset}, #{page.pageSize}
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from sys_acl
     where id = #{id,jdbcType=INTEGER}

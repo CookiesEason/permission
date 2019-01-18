@@ -2,6 +2,7 @@ package com.example.permission.service;
 
 import com.example.permission.common.RequestHolder;
 import com.example.permission.dao.SysAclModuleMapper;
+import com.example.permission.exception.ParamException;
 import com.example.permission.exception.PermissionException;
 import com.example.permission.form.AclModuleParam;
 import com.example.permission.model.SysAclModule;
@@ -28,16 +29,14 @@ public class SysAclModuleService {
     public void save(AclModuleParam aclModuleParam) {
         ValidatorUtil.check(aclModuleParam);
         if (checkExist(aclModuleParam.getParentId(), aclModuleParam.getName(), aclModuleParam.getId())) {
-            throw new PermissionException("权限模块有相同的相同的权限名称");
+            throw new ParamException("权限模块有相同的相同的权限名称");
         }
         SysAclModule sysAclModule = SysAclModule.builder().name(aclModuleParam.getName())
                 .parentId(aclModuleParam.getParentId()).seq(aclModuleParam.getSeq())
                 .status(aclModuleParam.getStatus()).remark(aclModuleParam.getRemark()).build();
         sysAclModule.setLevel(LevelUtil.calculateLevel(getLevel(aclModuleParam.getParentId()),
                 aclModuleParam.getParentId() ));
-        sysAclModule.setOperator("Test");
-        sysAclModule.setOperateIp("127.0.0.1");
-        sysAclModule.setName(RequestHolder.getUser().getUsername());
+        sysAclModule.setOperator(RequestHolder.getUser().getUsername());
         sysAclModule.setOperateIp(IPUtil.getRemoteIp(RequestHolder.getRequest()));
         sysAclModule.setOperateTime(new Date());
         sysAclModuleMapper.insertSelective(sysAclModule);
@@ -46,7 +45,7 @@ public class SysAclModuleService {
     public void update(AclModuleParam aclModuleParam) {
         ValidatorUtil.check(aclModuleParam);
         if (checkExist(aclModuleParam.getParentId(), aclModuleParam.getName(), aclModuleParam.getId())) {
-            throw new PermissionException("权限模块有相同的相同的权限名称");
+            throw new ParamException("权限模块有相同的相同的权限名称");
         }
         SysAclModule old = sysAclModuleMapper.selectByPrimaryKey(aclModuleParam.getId());
         Preconditions.checkNotNull(old, "更新权限模块不存在");
@@ -57,7 +56,7 @@ public class SysAclModuleService {
                 aclModuleParam.getParentId() ));
 //        sysAclModule.setOperator("Test");
 //        sysAclModule.setOperateIp("127.0.0.1");
-        sysAclModule.setName(RequestHolder.getUser().getUsername());
+        sysAclModule.setOperator(RequestHolder.getUser().getUsername());
         sysAclModule.setOperateIp(IPUtil.getRemoteIp(RequestHolder.getRequest()));
         sysAclModule.setOperateTime(new Date());
         updateWithChild(old, sysAclModule);
