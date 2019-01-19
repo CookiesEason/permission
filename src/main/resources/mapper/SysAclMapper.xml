@@ -44,6 +44,18 @@
     order by seq asc, name asc
     limit #{page.offset}, #{page.pageSize}
   </select>
+  <select id="getAll" resultType="com.example.permission.model.SysAcl">
+    SELECT <include refid="Base_Column_List"/>
+    FROM sys_acl
+  </select>
+  <select id="getByIdList" resultType="com.example.permission.model.SysAcl">
+    SELECT <include refid="Base_Column_List"/>
+    from sys_acl
+    where id in
+    <foreach collection="idList" item="id" open="(" close=")" separator=",">
+      #{id}
+    </foreach>
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from sys_acl
     where id = #{id,jdbcType=INTEGER}

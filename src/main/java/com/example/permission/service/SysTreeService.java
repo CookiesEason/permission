@@ -1,9 +1,12 @@
 package com.example.permission.service;
 
+import com.example.permission.dao.SysAclMapper;
 import com.example.permission.dao.SysAclModuleMapper;
 import com.example.permission.dao.SysDeptMapper;
+import com.example.permission.dto.AclDto;
 import com.example.permission.dto.AclModuleDto;
 import com.example.permission.dto.DeptLevelDto;
+import com.example.permission.model.SysAcl;
 import com.example.permission.model.SysAclModule;
 import com.example.permission.model.SysDept;
 import com.example.permission.util.LevelUtil;
@@ -14,8 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author CookiesEason
@@ -29,6 +32,12 @@ public class SysTreeService {
 
     @Resource
     private SysAclModuleMapper aclModuleMapper;
+
+    @Resource
+    private SysCoreService sysCoreService;
+
+    @Resource
+    private SysAclMapper sysAclMapper;
 
     public List<DeptLevelDto> deptTree() {
         List<SysDept> sysDepts = sysDeptMapper.getAllDept();
@@ -48,6 +57,26 @@ public class SysTreeService {
             aclModuleDtos.add(dto);
         }
         return aclModuleToTree(aclModuleDtos);
+    }
+
+    public List<AclModuleDto> roleTree(Integer roleId) {
+        List<SysAcl> sysAclList = sysCoreService.getCurrentUserAcls();
+        List<SysAcl> roleAclList = sysCoreService.getRoleAcls(roleId);
+        List<SysAcl> aclList = sysAclMapper.getAll();
+        Set<Integer> userAclIdSet = sysAclList.stream().map(SysAcl::getId).collect(Collectors.toSet());
+        Set<Integer> roleAclSet = roleAclList.stream().map(SysAcl::getId).collect(Collectors.toSet());
+        List<AclDto> aclDtoList = Lists.newArrayList();
+        for (SysAcl sysAcl : aclList) {
+            AclDto aclDto = AclDto.adapt(sysAcl);
+            if (userAclIdSet.contains(sysAcl.getId())) {
+                aclDto.setHasAcl(true);
+            }
+            if (roleAclSet.contains(sysAcl.getId())) {
+                aclDto.setChecked(true);
+            }
+            aclDtoList.add(aclDto);
+        }
+        return aclListToTree(aclDtoList);
     }
 
     private List<DeptLevelDto> deptListToTree(List<DeptLevelDto> deptLevelList) {
@@ -108,6 +137,36 @@ public class SysTreeService {
                 aclModuleDto.setAclModules(temp);
                 transformAclModuleTree(temp, nextLevel, levelDtoMultimap);
             }
+        }
+    }
+
+    private List<AclModuleDto> aclListToTree(List<AclDto> aclDtoList) {
+        if (CollectionUtils.isEmpty(aclDtoList)) {
+            return Lists.newArrayList();
+        }
+        List<AclModuleDto> aclModuleDtoLists = aclModuleTree();
+        Multimap<Integer, AclDto> moduleIdAclMap = ArrayListMultimap.create();
+        for (AclDto dto : aclDtoList) {
+            if (dto.getStatus() == 1) {
+                moduleIdAclMap.put(dto.getAclModuleId(), dto);
+            }
+        }
+        bindAclsWithOrder(aclModuleDtoLists, moduleIdAclMap);
+        return aclModuleDtoLists;
+    }
+
+    private void bindAclsWithOrder(List<AclModuleDto> aclModuleDtoList,
+                                   Multimap<Integer, AclDto> moduleIdAclMap) {
+        if (CollectionUtils.isEmpty(aclModuleDtoList)) {
+            return;
+        }
+        for (AclModuleDto moduleDto : aclModuleDtoList) {
+            List<AclDto> aclDtoList = (List<AclDto>) moduleIdAclMap.get(moduleDto.getId());
+            if (!CollectionUtils.isEmpty(aclDtoList)) {
+                aclDtoList.sort(Comparator.comparingInt(SysAcl::getSeq));
+                moduleDto.setAcls(aclDtoList);
+            }
+            bindAclsWithOrder(moduleDto.getAclModules(), moduleIdAclMap);
         }
     }
 
