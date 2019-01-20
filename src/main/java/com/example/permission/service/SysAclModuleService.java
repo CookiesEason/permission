@@ -1,6 +1,7 @@
 package com.example.permission.service;
 
 import com.example.permission.common.RequestHolder;
+import com.example.permission.dao.SysAclMapper;
 import com.example.permission.dao.SysAclModuleMapper;
 import com.example.permission.exception.ParamException;
 import com.example.permission.exception.PermissionException;
@@ -25,6 +26,9 @@ public class SysAclModuleService {
 
     @Resource
     private SysAclModuleMapper sysAclModuleMapper;
+
+    @Resource
+    private SysAclMapper sysAclMapper;
 
     public void save(AclModuleParam aclModuleParam) {
         ValidatorUtil.check(aclModuleParam);
@@ -60,6 +64,18 @@ public class SysAclModuleService {
         sysAclModule.setOperateIp(IPUtil.getRemoteIp(RequestHolder.getRequest()));
         sysAclModule.setOperateTime(new Date());
         updateWithChild(old, sysAclModule);
+    }
+
+    public void delete(Integer id) {
+        SysAclModule sysAclModule = sysAclModuleMapper.selectByPrimaryKey(id);
+        Preconditions.checkNotNull(sysAclModule, "删除的权限模块不存在,无法删除");
+        if (sysAclModuleMapper.countByParentId(sysAclModule.getId()) > 0) {
+            throw new ParamException("当前模块下面有子模块,不能被删除");
+        }
+        if (sysAclMapper.countByAclModuleId(id) > 0) {
+            throw new ParamException("当前模块下面有权限点,不能被删除");
+        }
+        sysAclModuleMapper.deleteByPrimaryKey(id);
     }
 
     private void updateWithChild(SysAclModule aclModule, SysAclModule newAclModule) {

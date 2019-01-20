@@ -2,6 +2,7 @@ package com.example.permission.service;
 
 import com.example.permission.common.RequestHolder;
 import com.example.permission.dao.SysDeptMapper;
+import com.example.permission.dao.SysUserMapper;
 import com.example.permission.exception.ParamException;
 import com.example.permission.form.DeptParam;
 import com.example.permission.model.SysDept;
@@ -24,6 +25,9 @@ public class SysDeptService {
 
     @Resource
     private SysDeptMapper sysDeptMapper;
+
+    @Resource
+    private SysUserMapper sysUserMapper;
 
     public void save(DeptParam deptParam) {
         ValidatorUtil.check(deptParam);
@@ -57,6 +61,18 @@ public class SysDeptService {
         sysDept.setOperateIp(IPUtil.getRemoteIp(RequestHolder.getRequest()));
         sysDept.setOperateTime(new Date());
         updateWithChild(old, sysDept);
+    }
+
+    public void delete(Integer id) {
+        SysDept sysDept = sysDeptMapper.selectByPrimaryKey(id);
+        Preconditions.checkNotNull(sysDept, "删除的部门不存在,无法删除");
+        if (sysDeptMapper.countByParentId(sysDept.getId()) > 0) {
+            throw new ParamException("当前部门下面有子部门,不能被删除");
+        }
+        if (sysUserMapper.countByDeptId(id) > 0) {
+            throw new ParamException("当前部门下面有用户,不能被删除");
+        }
+        sysDeptMapper.deleteByPrimaryKey(id);
     }
 
     private void updateWithChild(SysDept oldDept, SysDept newDept) {

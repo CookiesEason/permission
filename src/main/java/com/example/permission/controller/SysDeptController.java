@@ -7,6 +7,7 @@ import com.example.permission.util.ResultVOUtil;
 import com.example.permission.vo.ResultVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -41,6 +42,12 @@ public class SysDeptController {
     @ResponseBody
     public ResultVO updateDept(DeptParam deptParam) {
         sysDeptService.update(deptParam);
+        return ResultVOUtil.success();
+    }
+
+    @GetMapping("/delete")
+    public ResultVO deleteDept(Integer id) {
+        sysDeptService.delete(id);
         return ResultVOUtil.success();
     }
 

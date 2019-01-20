@@ -47,7 +47,12 @@
       <include refid="Base_Column_List"/>
     from sys_dept where level LIKE #{level} || level like concat(#{level},'.%')
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <select id="countByParentId" resultType="java.lang.Integer">
+      select count(1)
+      from sys_dept
+      where parent_id = #{deptId}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from sys_dept
     where id = #{id,jdbcType=INTEGER}
   </delete>

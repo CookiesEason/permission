@@ -48,7 +48,12 @@
     <include refid="Base_Column_List"/>
     from sys_acl_module
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <select id="countByParentId" resultType="java.lang.Integer">
+      select count(1)
+      from sys_acl_module
+      where parent_id = #{aclModuleId}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from sys_acl_module
     where id = #{id,jdbcType=INTEGER}
   </delete>

@@ -41,4 +41,10 @@ public class SysAclModuleController {
         return ResultVOUtil.success(sysTreeService.aclModuleTree());
     }
 
+    @GetMapping("/delete")
+    public ResultVO deleteAclModule(Integer id) {
+        aclModuleService.delete(id);
+        return ResultVOUtil.success();
+    }
+
 }
