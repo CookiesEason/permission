@@ -102,6 +102,10 @@ public class SysUserService {
         return PageResult.<SysUser>builder().build();
     }
 
+    public List<SysUser> getAll() {
+        return sysUserMapper.getAll();
+    }
+
     private SysUser findByKeyword(String keyword) {
         return sysUserMapper.findByKeyword(keyword);
     }

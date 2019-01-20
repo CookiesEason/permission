@@ -58,6 +58,18 @@
     order by username asc
     limit #{page.offset}, #{page.pageSize}
   </select>
+    <select id="getByIdList" resultType="com.example.permission.model.SysUser">
+      select <include refid="Base_Column_List"/>
+      from sys_user
+      where id in
+      <foreach collection="idList" item="id" open="(" close=")" separator=",">
+        #{id}
+      </foreach>
+    </select>
+  <select id="getAll" resultType="com.example.permission.model.SysUser">
+    select <include refid="Base_Column_List"/>
+    from sys_user
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from sys_user
     where id = #{id,jdbcType=INTEGER}

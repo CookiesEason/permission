@@ -23,9 +23,18 @@
       FROM sys_role_user
       WHERE user_id = #{userId}
     </select>
+    <select id="getUserIdListByRoleId" resultType="java.lang.Integer">
+      select user_id
+      from sys_role_user
+      where role_id = #{roleId}
+    </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from sys_role_user
     where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByRoleId">
+    delete from sys_role_user
+    where role_id = #{roleId}
   </delete>
   <insert id="insert" parameterType="com.example.permission.model.SysRoleUser">
     insert into sys_role_user (id, role_id, user_id, 
@@ -77,6 +86,17 @@
         #{operateIp,jdbcType=VARCHAR},
       </if>
     </trim>
+  </insert>
+  <insert id="batchInsert">
+    insert into sys_role_user (role_id, user_id,
+                               operator, operate_time, operate_ip
+    )
+    values
+    <foreach collection="roleUsers" item="roleUser" separator=",">
+      (#{roleUser.roleId}, #{roleUser.userId},
+      #{roleUser.operator}, #{roleUser.operateTime}, #{roleUser.operateIp}
+      )
+    </foreach>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.example.permission.model.SysRoleUser">
     update sys_role_user
