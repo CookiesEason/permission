@@ -41,9 +41,4 @@ public class SysUserController {
         return ResultVOUtil.success(pageResult);
     }
 
-    @GetMapping("/info")
-    public ResultVO info() {
-        return ResultVOUtil.success(RequestHolder.getUser());
-    }
-
 }

@@ -2,12 +2,12 @@ package com.example.permission.filter;
 
 import com.example.permission.common.RequestHolder;
 import com.example.permission.model.SysUser;
+import com.example.permission.util.JsonUtil;
+import com.example.permission.util.ResultVOUtil;
+import com.example.permission.vo.ResultVO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -18,7 +18,6 @@ import java.io.PrintWriter;
  * 2019/01/17 14:17
  */
 @Slf4j
-@WebFilter(urlPatterns = "/api/sys/*", filterName = "loginFilter")
 public class LoginFilter implements Filter {
 
     @Override
@@ -33,11 +32,7 @@ public class LoginFilter implements Filter {
         SysUser sysUser = (SysUser) request.getSession().getAttribute("user");
         if (sysUser == null) {
            log.info("未登录，无法进行操作");
-            try {
-                returnJson(response, "未登录");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            noAuth(response);
             return;
         }
         RequestHolder.add(sysUser);
@@ -50,13 +45,13 @@ public class LoginFilter implements Filter {
 
     }
 
-    private void returnJson(HttpServletResponse response, String json) throws Exception{
-        response.setCharacterEncoding("UTF-8");
-        try (PrintWriter writer = response.getWriter()) {
-            writer.print(json);
-
+    private void noAuth(HttpServletResponse response) {
+        ResultVO resultVO = ResultVOUtil.error("未登录无法进行操作");
+        response.setContentType("application/json; charset=utf-8");
+        try {
+            response.getWriter().println(JsonUtil.obj2String(resultVO));
         } catch (IOException e) {
-            log.error("response error", e);
+            e.printStackTrace();
         }
     }
 }

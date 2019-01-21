@@ -11,6 +11,8 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author CookiesEason
@@ -42,6 +44,32 @@ public class SysCoreService {
         return sysAclMapper.getByIdList(aclIdList);
     }
 
+    public boolean hasUrlAcl(String url) {
+        if (isSuperAdmin()) {
+            return true;
+        }
+        List<SysAcl> sysAcls = sysAclMapper.getByUrl(url);
+        if (CollectionUtils.isEmpty(sysAcls)) {
+            return true;
+        }
+        List<SysAcl> userAcls = getCurrentUserAcls();
+        Set<Integer> userIdSet = userAcls.stream().map(SysAcl::getId).collect(Collectors.toSet());
+        boolean hasValidAcl = false;
+        for (SysAcl sysAcl : sysAcls) {
+            if (sysAcl == null || sysAcl.getStatus() != 1) {
+                continue;
+            }
+            hasValidAcl = true;
+            if (userIdSet.contains(sysAcl.getId())) {
+                return true;
+            }
+        }
+        if (!hasValidAcl) {
+            return true;
+        }
+        return false;
+    }
+
     private List<SysAcl> getUserAcls(Integer userId) {
         if (isSuperAdmin()) {
             sysAclMapper.getAll();
@@ -58,7 +86,7 @@ public class SysCoreService {
     }
 
     private boolean isSuperAdmin() {
-        return true;
+        return RequestHolder.getUser().getUsername().contains("admin");
     }
 
 

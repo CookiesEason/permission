@@ -56,7 +56,12 @@
       #{id}
     </foreach>
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <select id="getByUrl" resultType="com.example.permission.model.SysAcl">
+      select <include refid="Base_Column_List"/>
+      from sys_acl
+      where url = #{url}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from sys_acl
     where id = #{id,jdbcType=INTEGER}
   </delete>

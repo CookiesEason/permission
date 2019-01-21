@@ -7,7 +7,6 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 
 @SpringBootApplication
 @MapperScan(basePackages = "com.example.permission.dao")
-@ServletComponentScan(basePackages = {"com.example.permission.filter"})
 public class PermissionApplication {
 
     public static void main(String[] args) {

@@ -35,4 +35,9 @@ public class UserController {
         return ResultVOUtil.success();
     }
 
+    @GetMapping("/info")
+    public ResultVO info() {
+        return ResultVOUtil.success(RequestHolder.getUser());
+    }
+
 }
