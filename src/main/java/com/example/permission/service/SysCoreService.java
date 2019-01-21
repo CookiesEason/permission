@@ -1,11 +1,16 @@
 package com.example.permission.service;
 
+import com.example.permission.common.CacheKeyConstants;
 import com.example.permission.common.RequestHolder;
 import com.example.permission.dao.SysAclMapper;
 import com.example.permission.dao.SysRoleAclMapper;
 import com.example.permission.dao.SysRoleUserMapper;
 import com.example.permission.model.SysAcl;
+import com.example.permission.util.JsonUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -30,6 +35,9 @@ public class SysCoreService {
     @Resource
     private SysRoleAclMapper sysRoleAclMapper;
 
+    @Autowired
+    private SysCacheService sysCacheService;
+
     public List<SysAcl> getCurrentUserAcls() {
         int userId = RequestHolder.getUser().getId();
         return getUserAcls(userId);
@@ -52,7 +60,7 @@ public class SysCoreService {
         if (CollectionUtils.isEmpty(sysAcls)) {
             return true;
         }
-        List<SysAcl> userAcls = getCurrentUserAcls();
+        List<SysAcl> userAcls = getCurrentUserAclsFromCache();
         Set<Integer> userIdSet = userAcls.stream().map(SysAcl::getId).collect(Collectors.toSet());
         boolean hasValidAcl = false;
         for (SysAcl sysAcl : sysAcls) {
@@ -89,5 +97,18 @@ public class SysCoreService {
         return RequestHolder.getUser().getUsername().contains("admin");
     }
 
+
+    private List<SysAcl> getCurrentUserAclsFromCache() {
+        int userId = RequestHolder.getUser().getId();
+        String cacheVaule = sysCacheService.getFromCache(CacheKeyConstants.USER_ACLS, String.valueOf(userId));
+        if (StringUtils.isBlank(cacheVaule)) {
+            List<SysAcl> sysAcls = getCurrentUserAcls();
+            if (!CollectionUtils.isEmpty(sysAcls)) {
+                sysCacheService.saveCache(JsonUtil.obj2String(sysAcls), 600, CacheKeyConstants.USER_ACLS, String.valueOf(userId));
+            }
+            return sysAcls;
+        }
+        return JsonUtil.string2Object(cacheVaule, new TypeReference<List<SysAcl>>() {});
+    }
 
 }
