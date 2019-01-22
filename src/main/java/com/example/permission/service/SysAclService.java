@@ -11,6 +11,7 @@ import com.example.permission.util.IPUtil;
 import com.example.permission.util.ValidatorUtil;
 import com.example.permission.vo.PageResult;
 import com.google.common.base.Preconditions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -29,6 +30,9 @@ public class SysAclService {
     @Resource
     private SysAclMapper sysAclMapper;
 
+    @Autowired
+    private SysLogService sysLogService;
+
     public void save(AclParam aclParam) {
         ValidatorUtil.check(aclParam);
         if (checkExist(aclParam.getAclModuleId(), aclParam.getName(), aclParam.getId())) {
@@ -42,6 +46,7 @@ public class SysAclService {
         sysAcl.setOperateIp(IPUtil.getRemoteIp(RequestHolder.getRequest()));
         sysAcl.setOperateTime(new Date());
         sysAclMapper.insertSelective(sysAcl);
+        sysLogService.saveAclLog(null, sysAcl);
     }
 
     public void update(AclParam aclParam) {
@@ -59,6 +64,7 @@ public class SysAclService {
         sysAcl.setOperateIp(IPUtil.getRemoteIp(RequestHolder.getRequest()));
         sysAcl.setOperateTime(new Date());
         sysAclMapper.updateByPrimaryKeySelective(sysAcl);
+        sysLogService.saveAclLog(old, sysAcl);
     }
 
     public PageResult<SysAcl> getPageByAclModuleId(Integer aclModuleId, PageQuery pageQuery) {

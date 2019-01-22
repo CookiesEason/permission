@@ -11,6 +11,7 @@ import com.example.permission.util.IPUtil;
 import com.example.permission.util.LevelUtil;
 import com.example.permission.util.ValidatorUtil;
 import com.google.common.base.Preconditions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -30,6 +31,9 @@ public class SysAclModuleService {
     @Resource
     private SysAclMapper sysAclMapper;
 
+    @Autowired
+    private SysLogService sysLogService;
+
     public void save(AclModuleParam aclModuleParam) {
         ValidatorUtil.check(aclModuleParam);
         if (checkExist(aclModuleParam.getParentId(), aclModuleParam.getName(), aclModuleParam.getId())) {
@@ -44,6 +48,7 @@ public class SysAclModuleService {
         sysAclModule.setOperateIp(IPUtil.getRemoteIp(RequestHolder.getRequest()));
         sysAclModule.setOperateTime(new Date());
         sysAclModuleMapper.insertSelective(sysAclModule);
+        sysLogService.saveAclmoduleLog(null, sysAclModule);
     }
 
     public void update(AclModuleParam aclModuleParam) {
@@ -58,12 +63,11 @@ public class SysAclModuleService {
                 .status(aclModuleParam.getStatus()).remark(aclModuleParam.getRemark()).build();
         sysAclModule.setLevel(LevelUtil.calculateLevel(getLevel(aclModuleParam.getParentId()),
                 aclModuleParam.getParentId() ));
-//        sysAclModule.setOperator("Test");
-//        sysAclModule.setOperateIp("127.0.0.1");
         sysAclModule.setOperator(RequestHolder.getUser().getUsername());
         sysAclModule.setOperateIp(IPUtil.getRemoteIp(RequestHolder.getRequest()));
         sysAclModule.setOperateTime(new Date());
         updateWithChild(old, sysAclModule);
+        sysLogService.saveAclmoduleLog(old, sysAclModule);
     }
 
     public void delete(Integer id) {

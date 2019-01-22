@@ -28,6 +28,40 @@
     from sys_log
     where id = #{id,jdbcType=INTEGER}
   </select>
+  <select id="countByLogDto" resultType="java.lang.Integer">
+    select count(1)
+    from sys_log
+    <include refid="queryConditions"/>
+  </select>
+  <select id="getPageByLogDto" resultType="com.example.permission.model.SysLogWithBLOBs">
+    select <include refid="Base_Column_List"/>,<include refid="Blob_Column_List"/>
+    from sys_log
+    <include refid="queryConditions"/>
+    ORDER BY operate_time DESC
+    limit #{page.offset}, #{page.pageSize}
+  </select>
+  <sql id="queryConditions">
+    <where>
+      <if test="dto.type != null">
+        AND type = #{dto.type}
+      </if>
+      <if test="dto.beforeSeg != null and dto.beforeSeg != ''">
+        AND old_value like #{dto.beforeSeg}
+      </if>
+      <if test="dto.afterSeg != null and dto.afterSeg != ''">
+        AND new_value like #{dto.afterSeg}
+      </if>
+      <if test="dto.operator != null and dto.operator != ''">
+        AND operator like #{dto.operator}
+      </if>
+      <if test="dto.fromTime != null">
+        AND operate_time &gt;= #{dto.fromTime}
+      </if>
+      <if test="dto.toTime != null">
+        AND operate_time &lt;= #{dto.toTime}
+      </if>
+    </where>
+  </sql>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from sys_log
     where id = #{id,jdbcType=INTEGER}

@@ -33,6 +33,9 @@ public class SysUserService {
     private SysUserMapper sysUserMapper;
 
     @Autowired
+    private SysLogService sysLogService;
+
+    @Autowired
     private JavaMailSender javaMailSender;
 
     public void save(UserParam userParam) {
@@ -52,6 +55,7 @@ public class SysUserService {
 //        SimpleMailMessage simpleMailMessage = EmailUtil.send(userParam.getMail(), password);
 //        javaMailSender.send(simpleMailMessage);
         sysUserMapper.insertSelective(sysUser);
+        sysLogService.saveUserLog(null, sysUser);
     }
 
 
@@ -67,6 +71,7 @@ public class SysUserService {
         sysUser.setOperateIp(IPUtil.getRemoteIp(RequestHolder.getRequest()));
         sysUser.setOperateTime(new Date());
         sysUserMapper.updateByPrimaryKeySelective(sysUser);
+        sysLogService.saveUserLog(old, sysUser);
     }
 
 

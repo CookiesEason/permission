@@ -8,6 +8,7 @@ import com.example.permission.model.SysRole;
 import com.example.permission.util.IPUtil;
 import com.example.permission.util.ValidatorUtil;
 import com.google.common.base.Preconditions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -24,6 +25,9 @@ public class SysRoleService {
     @Resource
     private SysRoleMapper sysRoleMapper;
 
+    @Autowired
+    private SysLogService sysLogService;
+
     public void save(RoleParam roleParam) {
         ValidatorUtil.check(roleParam);
         if (checkExistName(roleParam.getName(), roleParam.getId())) {
@@ -35,6 +39,7 @@ public class SysRoleService {
         sysRole.setOperateIp(IPUtil.getRemoteIp(RequestHolder.getRequest()));
         sysRole.setOperateTime(new Date());
         sysRoleMapper.insertSelective(sysRole);
+        sysLogService.saveRoleLog(null, sysRole);
     }
 
     public void update(RoleParam roleParam) {
@@ -50,6 +55,7 @@ public class SysRoleService {
         sysRole.setOperateIp(IPUtil.getRemoteIp(RequestHolder.getRequest()));
         sysRole.setOperateTime(new Date());
         sysRoleMapper.updateByPrimaryKeySelective(sysRole);
+        sysLogService.saveRoleLog(old, sysRole);
     }
 
     public List<SysRole> getAll() {

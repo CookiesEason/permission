@@ -10,6 +10,7 @@ import com.example.permission.util.IPUtil;
 import com.example.permission.util.LevelUtil;
 import com.example.permission.util.ValidatorUtil;
 import com.google.common.base.Preconditions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -29,6 +30,9 @@ public class SysDeptService {
     @Resource
     private SysUserMapper sysUserMapper;
 
+    @Autowired
+    private SysLogService sysLogService;
+
     public void save(DeptParam deptParam) {
         ValidatorUtil.check(deptParam);
         if (checkExist(deptParam.getParentId(), deptParam.getName(), deptParam.getId())) {
@@ -38,11 +42,11 @@ public class SysDeptService {
                 parentId(deptParam.getParentId()).seq(deptParam.getSeq()).remark(deptParam.getRemark())
                 .build();
         sysDept.setLevel(LevelUtil.calculateLevel(getLevel(deptParam.getParentId()), deptParam.getParentId()));
-        // TODO: 2019/01/15  暂时固定
         sysDept.setOperator(RequestHolder.getUser().getUsername());
         sysDept.setOperateIp(IPUtil.getRemoteIp(RequestHolder.getRequest()));
         sysDept.setOperateTime(new Date());
         sysDeptMapper.insertSelective(sysDept);
+        sysLogService.saveDeptLog(null, sysDept);
     }
 
     public void update(DeptParam deptParam) {
@@ -56,11 +60,11 @@ public class SysDeptService {
                 parentId(deptParam.getParentId()).seq(deptParam.getSeq()).remark(deptParam.getRemark())
                 .build();
         sysDept.setLevel(LevelUtil.calculateLevel(getLevel(deptParam.getParentId()), sysDept.getParentId() ));
-        // TODO: 2019/01/15  暂时固定
         sysDept.setOperator(RequestHolder.getUser().getUsername());
         sysDept.setOperateIp(IPUtil.getRemoteIp(RequestHolder.getRequest()));
         sysDept.setOperateTime(new Date());
         updateWithChild(old, sysDept);
+        sysLogService.saveDeptLog(old, sysDept);
     }
 
     public void delete(Integer id) {
